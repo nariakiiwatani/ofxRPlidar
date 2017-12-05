@@ -48,7 +48,7 @@ device::A2::A2()
 
 device::A2::~A2()
 {
-	stop();
+	disconnect();
 	if(driver_) {
 		RPlidarDriver::DisposeDriver(driver_);
 	}
@@ -124,22 +124,62 @@ bool device::A2::connect(const string &serial_path, int baud_rate)
 	return true;
 }
 
+bool device::A2::disconnect()
+{
+	if(isConnected()) {
+		stop();
+		driver_->disconnect();
+		return true;
+	}
+	return false;
+}
+
 bool device::A2::isConnected() const
 {
 	return driver_ && driver_->isConnected();
 }
 
-bool device::A2::start()
+bool device::A2::start(bool threaded)
 {
-	return isConnected()
-	&& !IS_FAIL(driver_->startMotor())
-	&& !IS_FAIL(driver_->startScan(true));
+	if(isConnected()
+	   && !IS_FAIL(driver_->startMotor())
+	   && !IS_FAIL(driver_->startScan(true))) {
+		if(threaded) {
+			startThread();
+		}
+	   return true;
+   }
+	return false;
 }
 bool device::A2::stop()
 {
-	return isConnected()
-	&& !IS_FAIL(driver_->stop())
-	&& !IS_FAIL(driver_->stopMotor());
+	if(isThreadRunning()) {
+		stopThread();
+	}
+	if(isConnected()
+	   && !IS_FAIL(driver_->stop())
+	   && !IS_FAIL(driver_->stopMotor())) {
+		return true;
+	}
+	return false;
+}
+
+void device::A2::threadedFunction()
+{
+	while(isThreadRunning()) {
+		lock();
+		result_ = scan(true);
+		unlock();
+	}
+}
+
+vector<device::A2::ScannedData> device::A2::getResult()
+{
+	vector<device::A2::ScannedData> ret;
+	lock();
+	ret = result_;
+	unlock();
+	return ret;
 }
 
 vector<device::A2::ScannedData> device::A2::scan(bool ascend)

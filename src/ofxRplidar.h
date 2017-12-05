@@ -14,6 +14,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 #include <string>
 #include "ofTypes.h"
+#include "ofThread.h"
 
 namespace rp { namespace standalone { namespace rplidar {
 class RPlidarDriver;
@@ -21,7 +22,7 @@ class RPlidarDriver;
 namespace ofx {
 namespace rplidar {
 namespace device {
-class A2
+	class A2 : ofThread
 {
 public:
 	struct ScannedData {
@@ -31,14 +32,18 @@ public:
 		bool sync;
 	};
 	A2();
-	~A2();
+	virtual ~A2();
 	static std::vector<ofSerialDeviceInfo> getDeviceList();
 	bool connect(const std::string &serial_path, int baud_rate=115200);
+	bool disconnect();
 	bool isConnected() const;
-	bool start();
+	bool start(bool threaded=true);
 	bool stop();
 	std::vector<ScannedData> scan(bool ascend=true);
-private:
+	std::vector<ScannedData> getResult();
+protected:
+	void threadedFunction();
+	std::vector<ScannedData> result_;
 	rp::standalone::rplidar::RPlidarDriver *driver_;
 };
 }
