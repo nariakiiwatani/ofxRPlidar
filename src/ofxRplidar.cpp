@@ -155,6 +155,7 @@ bool device::A2::stop()
 {
 	if(isThreadRunning()) {
 		stopThread();
+		waitForThread();
 	}
 	if(isConnected()
 	   && !IS_FAIL(driver_->stop())
@@ -175,9 +176,8 @@ void device::A2::threadedFunction()
 
 vector<device::A2::ScannedData> device::A2::getResult()
 {
-	vector<device::A2::ScannedData> ret;
 	lock();
-	ret = result_;
+	vector<device::A2::ScannedData> ret = result_;
 	unlock();
 	return ret;
 }
