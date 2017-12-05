@@ -171,15 +171,23 @@ void device::A2::threadedFunction()
 		lock();
 		result_ = scan(true);
 		unlock();
+		if(!isConnected()) {
+			stopThread();
+		}
 	}
 }
 
 vector<device::A2::ScannedData> device::A2::getResult()
 {
-	lock();
-	vector<device::A2::ScannedData> ret = result_;
-	unlock();
-	return ret;
+	if(isThreadRunning()) {
+		lock();
+		vector<device::A2::ScannedData> ret = result_;
+		unlock();
+		return ret;
+	}
+	else {
+		return result_;
+	}
 }
 
 vector<device::A2::ScannedData> device::A2::scan(bool ascend)
