@@ -15,6 +15,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 #include <string>
 #include "ofTypes.h"
 #include "ofThread.h"
+#include "rplidar.h" //RPLIDAR standard sdk, all-in-one header
 
 namespace rp { namespace standalone { namespace rplidar {
 class RPlidarDriver;
@@ -35,16 +36,22 @@ public:
 	virtual ~A2();
 	static std::vector<ofSerialDeviceInfo> getDeviceList();
 	bool connect(const std::string &serial_path, int baud_rate=115200);
+	bool reconnect(int baud_rate=115200);
 	bool disconnect();
 	bool isConnected() const;
 	bool start(bool threaded=true);
 	bool stop();
 	std::vector<ScannedData> scan(bool ascend=true);
 	std::vector<ScannedData> getResult();
+	std::string getSerialPath() const { serial_path_; }
+	std::string getSerialNumber() const;
 protected:
+	std::string serial_path_;
 	void threadedFunction();
 	std::vector<ScannedData> result_;
 	rp::standalone::rplidar::RPlidarDriver *driver_;
+	rplidar_response_device_info_t device_info_;
+	rplidar_response_device_health_t health_info_;
 };
 }
 }

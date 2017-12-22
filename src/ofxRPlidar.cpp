@@ -15,7 +15,6 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 #include "ofUtils.h"
 #include "ofSerial.h"
 
-#include "rplidar.h" //RPLIDAR standard sdk, all-in-one header
 
 using namespace rp::standalone::rplidar;
 using namespace ofx::rplidar;
@@ -57,9 +56,8 @@ device::A2::~A2()
 bool device::A2::connect(const string &serial_path, int baud_rate)
 {
 	u_result op_result;
-
-	rplidar_response_device_health_t healthinfo;
-	rplidar_response_device_info_t devinfo;
+	
+	serial_path_ = serial_path;
 	// try to connect
 	if (IS_FAIL(driver_->connect(serial_path.c_str(), baud_rate))) {
 		ofLogError("RPLIDAR", "Error, cannot bind to the specified serial port %s.\n", serial_path.c_str());
@@ -68,7 +66,7 @@ bool device::A2::connect(const string &serial_path, int baud_rate)
 	
 	// retrieving the device info
 	////////////////////////////////////////
-	op_result = driver_->getDeviceInfo(devinfo);
+	op_result = driver_->getDeviceInfo(device_info_);
 	
 	if (IS_FAIL(op_result)) {
 		if (op_result == RESULT_OPERATION_TIMEOUT) {
@@ -82,20 +80,17 @@ bool device::A2::connect(const string &serial_path, int baud_rate)
 	}
 	
 	// print out the device serial number, firmware and hardware version number..
-	string serial_number;
-	for (int pos = 0; pos < 16 ;++pos) {
-		serial_number += ofToHex(devinfo.serialnum[pos]);
-	}
+	string serial_number = getSerialNumber();
 	ofLogVerbose("RPLIDAR", "Serial Number: %s", serial_number.c_str());
 	
 	ofLogVerbose("RPLIDAR", "Version: %s", RPLIDAR_SDK_VERSION);
-	ofLogVerbose("RPLIDAR", "Firmware Ver: %d.%02d", devinfo.firmware_version>>8, devinfo.firmware_version & 0xFF);
-	ofLogVerbose("RPLIDAR", "Hardware Rev: %d", (int)devinfo.hardware_version);
+	ofLogVerbose("RPLIDAR", "Firmware Ver: %d.%02d", device_info_.firmware_version>>8, device_info_.firmware_version & 0xFF);
+	ofLogVerbose("RPLIDAR", "Hardware Rev: %d", (int)device_info_.hardware_version);
 	
 	
 	// check the device health
 	////////////////////////////////////////
-	op_result = driver_->getHealth(healthinfo);
+	op_result = driver_->getHealth(health_info_);
 	if (IS_OK(op_result)) { // the macro IS_OK is the preperred way to judge whether the operation is succeed.
 		ofLogVerbose("RPLIDAR", "health status: %s", [](_u8 status) {
 			switch (status) {
@@ -106,15 +101,14 @@ bool device::A2::connect(const string &serial_path, int baud_rate)
 				case RPLIDAR_STATUS_ERROR:
 					return "Error.";
 			}
-		}(healthinfo.status));
-		ofLogVerbose("RPLIDAR", " (errorcode: %d)", healthinfo.error_code);
+		}(health_info_.status));
+		ofLogVerbose("RPLIDAR", " (errorcode: %d)", health_info_.error_code);
 	} else {
 		ofLogError("RPLIDAR", "Error, cannot retrieve the lidar health code: %x", op_result);
 		return false;
 	}
 	
-	
-	if (healthinfo.status == RPLIDAR_STATUS_ERROR) {
+	if (health_info_.status == RPLIDAR_STATUS_ERROR) {
 		ofLogError("ROLIDAR", "Error, rplidar internal error detected. Please reboot the device to retry.");
 		// enable the following code if you want rplidar to be reboot by software
 		// drv->reset();
@@ -122,6 +116,11 @@ bool device::A2::connect(const string &serial_path, int baud_rate)
 	}
 	
 	return true;
+}
+
+bool device::A2::reconnect(int baud_rate)
+{
+	return connect(serial_path_, baud_rate);
 }
 
 bool device::A2::disconnect()
@@ -147,8 +146,8 @@ bool device::A2::start(bool threaded)
 		if(threaded) {
 			startThread();
 		}
-	   return true;
-   }
+		return true;
+	}
 	return false;
 }
 bool device::A2::stop()
@@ -188,6 +187,15 @@ vector<device::A2::ScannedData> device::A2::getResult()
 	else {
 		return result_;
 	}
+}
+
+string device::A2::getSerialNumber() const
+{
+	string ret;
+	for (int pos = 0; pos < 16 ;++pos) {
+		ret += ofToHex(device_info_.serialnum[pos]);
+	}
+	return ret;
 }
 
 vector<device::A2::ScannedData> device::A2::scan(bool ascend)
