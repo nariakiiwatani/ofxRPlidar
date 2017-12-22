@@ -2,9 +2,9 @@
 
 //--------------------------------------------------------------
 void ofApp::setup(){
-	auto sensor_list = ofxRplidar::getDeviceList();
+	auto sensor_list = ofxRPlidar::getDeviceList();
 	for(auto &sensor_info : sensor_list) {
-		auto sensor = make_shared<ofxRplidar>();
+		auto sensor = make_shared<ofxRPlidar>();
 		if(sensor->connect(sensor_info.getDevicePath())) {
 			sensor->start();
 			sensors_.push_back(sensor);

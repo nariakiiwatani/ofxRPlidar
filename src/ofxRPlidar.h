@@ -22,7 +22,7 @@ class RPlidarDriver;
 namespace ofx {
 namespace rplidar {
 namespace device {
-	class A2 : ofThread
+class A2 : ofThread
 {
 public:
 	struct ScannedData {
@@ -50,4 +50,4 @@ protected:
 }
 }
 
-using ofxRplidar = ofx::rplidar::device::A2;
+using ofxRPlidar = ofx::rplidar::device::A2;

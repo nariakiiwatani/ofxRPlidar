@@ -1,1 +1,1 @@
-ofxRPLidar
+ofxRPlidar

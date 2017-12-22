@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ofMain.h"
-#include "ofxRplidar.h"
+#include "ofxRPlidar.h"
 
 class ofApp : public ofBaseApp{
 	
@@ -22,5 +22,5 @@ public:
 	void dragEvent(ofDragInfo dragInfo);
 	void gotMessage(ofMessage msg);
 private:
-	std::vector<std::shared_ptr<ofxRplidar>> sensors_;
+	std::vector<std::shared_ptr<ofxRPlidar>> sensors_;
 };
