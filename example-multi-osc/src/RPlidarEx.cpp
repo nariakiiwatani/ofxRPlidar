@@ -147,6 +147,7 @@ vector<RPlidarEx::Result> RPlidarEx::update()
 		result_.clear();
 		return result_;
 	}
+	handle_->update();
 	scanned_data_ = handle_->getResult();
 	vector<cv::Point2f> points;
 	points.reserve(scanned_data_.size());

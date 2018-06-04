@@ -167,25 +167,44 @@ bool device::A2::stop()
 void device::A2::threadedFunction()
 {
 	while(isThreadRunning()) {
+		result_.back() = scan(true);
 		lock();
-		result_ = scan(true);
+		has_new_frame_ = true;
+		result_.swap();
 		unlock();
+		ofSleepMillis(1);
 		if(!isConnected()) {
 			stopThread();
 		}
 	}
 }
 
+void device::A2::update()
+{
+	bool new_frame = false;
+	if(isThreadRunning()) {
+		lock();
+		new_frame = has_new_frame_;
+		has_new_frame_ = false;
+		unlock();
+	}
+	else {
+		result_.front() = scan(true);
+		new_frame = true;
+	}
+	is_frame_new_ = new_frame;
+}
+
 vector<device::A2::ScannedData> device::A2::getResult()
 {
 	if(isThreadRunning()) {
 		lock();
-		vector<device::A2::ScannedData> ret = result_;
+		vector<device::A2::ScannedData> ret = result_.front();
 		unlock();
 		return ret;
 	}
 	else {
-		return result_;
+		return result_.front();
 	}
 }
 

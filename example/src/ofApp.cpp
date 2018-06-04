@@ -19,7 +19,8 @@ void ofApp::update(){
 //--------------------------------------------------------------
 void ofApp::draw(){
 	for(auto &s : sensors_) {
-		auto data = s->scan();
+		s->update();
+		auto data = s->getResult();
 		ofPushMatrix();
 		ofTranslate(ofVec2f(ofGetWidth(), ofGetHeight())/2.f);
 		for(auto &d : data) {
