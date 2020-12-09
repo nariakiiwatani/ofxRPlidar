@@ -19,6 +19,7 @@ vs:
 	ADDON_SOURCES_EXCLUDE = libs/rplidar/src/arch/macOS%
 	ADDON_INCLUDES_EXCLUDE += libs/rplidar/src/arch/linux%
 	ADDON_SOURCES_EXCLUDE += libs/rplidar/src/arch/linux%
+	ADDON_DEFINES = _WIN32
 
 linux:
 	ADDON_INCLUDES_EXCLUDE = libs/rplidar/src/arch/win32%
