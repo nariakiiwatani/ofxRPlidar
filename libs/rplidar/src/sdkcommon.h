@@ -32,41 +32,19 @@
  *
  */
 
-#pragma once
-
-// RP-Lidar Input Packets
-
-#define RPLIDAR_CMD_SYNC_BYTE        0xA5
-#define RPLIDAR_CMDFLAG_HAS_PAYLOAD  0x80
-
-
-#define RPLIDAR_ANS_SYNC_BYTE1       0xA5
-#define RPLIDAR_ANS_SYNC_BYTE2       0x5A
-
-#define RPLIDAR_ANS_PKTFLAG_LOOP     0x1
-
-#define RPLIDAR_ANS_HEADER_SIZE_MASK        0x3FFFFFFF
-#define RPLIDAR_ANS_HEADER_SUBTYPE_SHIFT    (30)
-
 #if defined(_WIN32)
-#pragma pack(1)
+#include "arch\win32\arch_win32.h"
+#elif defined(_MACOS)
+#include "arch/macOS/arch_macOS.h"
+#elif defined(__GNUC__)
+#include "arch/linux/arch_linux.h"
+#else
+#error "unsupported target"
 #endif
 
-typedef struct _rplidar_cmd_packet_t {
-    _u8 syncByte; //must be RPLIDAR_CMD_SYNC_BYTE
-    _u8 cmd_flag; 
-    _u8 size;
-    _u8 data[0];
-} __attribute__((packed)) rplidar_cmd_packet_t;
+#include "hal/types.h"
+#include "hal/assert.h"
 
+#include "rplidar.h"
 
-typedef struct _rplidar_ans_header_t {
-    _u8  syncByte1; // must be RPLIDAR_ANS_SYNC_BYTE1
-    _u8  syncByte2; // must be RPLIDAR_ANS_SYNC_BYTE2
-    _u32 size_q30_subtype; // see _u32 size:30; _u32 subType:2;
-    _u8  type;
-} __attribute__((packed)) rplidar_ans_header_t;
-
-#if defined(_WIN32)
-#pragma pack()
-#endif
+#include "hal/util.h"

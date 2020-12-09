@@ -34,39 +34,54 @@
 
 #pragma once
 
-// RP-Lidar Input Packets
+#include "hal/types.h"
+#define CLASS_THREAD(c , x ) \
+	rp::hal::Thread::create_member<c, &c::x>(this )
 
-#define RPLIDAR_CMD_SYNC_BYTE        0xA5
-#define RPLIDAR_CMDFLAG_HAS_PAYLOAD  0x80
+namespace rp{ namespace hal{
 
+class Thread
+{
+public:
+    enum priority_val_t
+	{
+		PRIORITY_REALTIME = 0,
+		PRIORITY_HIGH     = 1,
+		PRIORITY_NORMAL   = 2,
+		PRIORITY_LOW      = 3,
+		PRIORITY_IDLE     = 4,
+	};
 
-#define RPLIDAR_ANS_SYNC_BYTE1       0xA5
-#define RPLIDAR_ANS_SYNC_BYTE2       0x5A
+    template <class T, u_result (T::*PROC)(void)>
+    static Thread create_member(T * pthis)
+    {
+		return create(_thread_thunk<T,PROC>, pthis);
+	}
 
-#define RPLIDAR_ANS_PKTFLAG_LOOP     0x1
+	template <class T, u_result (T::*PROC)(void) >
+	static _word_size_t THREAD_PROC _thread_thunk(void * data)
+	{
+		return (static_cast<T *>(data)->*PROC)();
+	}
+	static Thread create(thread_proc_t proc, void * data = NULL );
 
-#define RPLIDAR_ANS_HEADER_SIZE_MASK        0x3FFFFFFF
-#define RPLIDAR_ANS_HEADER_SUBTYPE_SHIFT    (30)
+public:
+    ~Thread() { }
+    Thread():  _data(NULL),_func(NULL),_handle(0)  {}
+    _word_size_t getHandle(){ return _handle;}
+    u_result terminate();
+    void *getData() { return _data;}
+    u_result join(unsigned long timeout = -1);
+	u_result setPriority( priority_val_t p);
+	priority_val_t getPriority();
 
-#if defined(_WIN32)
-#pragma pack(1)
-#endif
+    bool operator== ( const Thread & right) { return this->_handle == right._handle; }
+protected:
+    Thread( thread_proc_t proc, void * data ): _data(data),_func(proc), _handle(0)  {}
+    void * _data;
+    thread_proc_t _func;
+    _word_size_t _handle;
+};
 
-typedef struct _rplidar_cmd_packet_t {
-    _u8 syncByte; //must be RPLIDAR_CMD_SYNC_BYTE
-    _u8 cmd_flag; 
-    _u8 size;
-    _u8 data[0];
-} __attribute__((packed)) rplidar_cmd_packet_t;
+}}
 
-
-typedef struct _rplidar_ans_header_t {
-    _u8  syncByte1; // must be RPLIDAR_ANS_SYNC_BYTE1
-    _u8  syncByte2; // must be RPLIDAR_ANS_SYNC_BYTE2
-    _u32 size_q30_subtype; // see _u32 size:30; _u32 subType:2;
-    _u8  type;
-} __attribute__((packed)) rplidar_ans_header_t;
-
-#if defined(_WIN32)
-#pragma pack()
-#endif

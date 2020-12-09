@@ -22,7 +22,11 @@ using namespace std;
 
 namespace {
 	bool isDeviceRplidar(ofSerialDeviceInfo &device) {
+#if defined(TARGET_WIN32)
+		return ofIsStringInString(device.getDeviceName(), "Silicon Labs CP210x USB to UART Bridge");
+#else
 		return ofIsStringInString(device.getDeviceName(), "tty.SLAB_USBtoUART");
+	#endif
 	}
 }
 vector<ofSerialDeviceInfo> device::A2::getDeviceList()
@@ -38,7 +42,7 @@ vector<ofSerialDeviceInfo> device::A2::getDeviceList()
 device::A2::A2()
 {
 	// create the driver instance
-	driver_ = RPlidarDriver::CreateDriver(RPlidarDriver::DRIVER_TYPE_SERIALPORT);
+	driver_ = RPlidarDriver::CreateDriver(DRIVER_TYPE_SERIALPORT);
 	
 	if (!driver_) {
 		ofLogError("RPLIDAR", "insufficent memory, exit");
@@ -142,7 +146,7 @@ bool device::A2::start(bool threaded)
 {
 	if(isConnected()
 	   && !IS_FAIL(driver_->startMotor())
-	   && !IS_FAIL(driver_->startScan(true))) {
+	   && !IS_FAIL(driver_->startScan(true, true))) {
 		if(threaded) {
 			startThread();
 		}

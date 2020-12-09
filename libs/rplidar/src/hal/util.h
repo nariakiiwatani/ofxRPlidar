@@ -34,39 +34,34 @@
 
 #pragma once
 
-// RP-Lidar Input Packets
 
-#define RPLIDAR_CMD_SYNC_BYTE        0xA5
-#define RPLIDAR_CMDFLAG_HAS_PAYLOAD  0x80
-
-
-#define RPLIDAR_ANS_SYNC_BYTE1       0xA5
-#define RPLIDAR_ANS_SYNC_BYTE2       0x5A
-
-#define RPLIDAR_ANS_PKTFLAG_LOOP     0x1
-
-#define RPLIDAR_ANS_HEADER_SIZE_MASK        0x3FFFFFFF
-#define RPLIDAR_ANS_HEADER_SUBTYPE_SHIFT    (30)
-
-#if defined(_WIN32)
-#pragma pack(1)
+//------
+/* _countof helper */
+#if !defined(_countof)
+#if !defined(__cplusplus)
+#define _countof(_Array) (sizeof(_Array) / sizeof(_Array[0]))
+#else
+extern "C++"
+{
+template <typename _CountofType, size_t _SizeOfArray>
+char (*__countof_helper( _CountofType (&_Array)[_SizeOfArray]))[_SizeOfArray];
+#define _countof(_Array) sizeof(*__countof_helper(_Array))
+}
+#endif
 #endif
 
-typedef struct _rplidar_cmd_packet_t {
-    _u8 syncByte; //must be RPLIDAR_CMD_SYNC_BYTE
-    _u8 cmd_flag; 
-    _u8 size;
-    _u8 data[0];
-} __attribute__((packed)) rplidar_cmd_packet_t;
-
-
-typedef struct _rplidar_ans_header_t {
-    _u8  syncByte1; // must be RPLIDAR_ANS_SYNC_BYTE1
-    _u8  syncByte2; // must be RPLIDAR_ANS_SYNC_BYTE2
-    _u32 size_q30_subtype; // see _u32 size:30; _u32 subType:2;
-    _u8  type;
-} __attribute__((packed)) rplidar_ans_header_t;
-
-#if defined(_WIN32)
-#pragma pack()
+/* _offsetof helper */
+#if !defined(offsetof)
+#define offsetof(_structure, _field) ((_word_size_t)&(((_structure *)0x0)->_field))
 #endif
+
+
+#define BEGIN_STATIC_CODE( _blockname_ ) \
+    static class _static_code_##_blockname_ {   \
+    public:     \
+        _static_code_##_blockname_ () 
+
+
+#define END_STATIC_CODE( _blockname_ ) \
+    }   _instance_##_blockname_;
+

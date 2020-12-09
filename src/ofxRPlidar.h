@@ -17,6 +17,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 #include "ofThread.h"
 #include "rplidar.h" //RPLIDAR standard sdk, all-in-one header
 #include "DoubleBuffer.h"
+#include "ofSerial.h"
 
 namespace rp { namespace standalone { namespace rplidar {
 class RPlidarDriver;
