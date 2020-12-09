@@ -16,6 +16,10 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 #include "ofTypes.h"
 #include "ofThread.h"
 #include "rplidar.h" //RPLIDAR standard sdk, all-in-one header
+// __le defined in rplidar sdk but the same name is used in deque(libc++).
+// it's seems not to be used in rplidar library at all so we undef it here.
+#undef __le
+
 #include "DoubleBuffer.h"
 #include "ofSerial.h"
 
