@@ -6,24 +6,20 @@ meta:
 	ADDON_URL = https://github.com/nariakiiwatani/ofxRPlidar
 
 common:
+	ADDON_INCLUDES_EXCLUDE = libs/rplidar/src/hal%
+	ADDON_INCLUDES_EXCLUDE += libs/rplidar/src/arch%
 
 osx:
-	ADDON_INCLUDES_EXCLUDE = libs/rplidar/src/arch/win32%
 	ADDON_SOURCES_EXCLUDE = libs/rplidar/src/arch/win32%
-	ADDON_INCLUDES_EXCLUDE += libs/rplidar/src/arch/linux%
 	ADDON_SOURCES_EXCLUDE += libs/rplidar/src/arch/linux%
 	ADDON_DEFINES = _MACOS
 
 vs:
-	ADDON_INCLUDES_EXCLUDE = libs/rplidar/src/arch/macOS%
 	ADDON_SOURCES_EXCLUDE = libs/rplidar/src/arch/macOS%
-	ADDON_INCLUDES_EXCLUDE += libs/rplidar/src/arch/linux%
 	ADDON_SOURCES_EXCLUDE += libs/rplidar/src/arch/linux%
 	ADDON_DEFINES = _WIN32
 
 linux:
-	ADDON_INCLUDES_EXCLUDE = libs/rplidar/src/arch/win32%
 	ADDON_SOURCES_EXCLUDE = libs/rplidar/src/arch/win32%
-	ADDON_INCLUDES_EXCLUDE += libs/rplidar/src/arch/macOS%
 	ADDON_SOURCES_EXCLUDE += libs/rplidar/src/arch/macOS%
 
