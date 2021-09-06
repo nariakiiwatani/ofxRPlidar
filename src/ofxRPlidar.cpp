@@ -24,6 +24,8 @@ namespace {
 	bool isDeviceRplidar(ofSerialDeviceInfo &device) {
 #if defined(TARGET_WIN32)
 		return ofIsStringInString(device.getDeviceName(), "Silicon Labs CP210x USB to UART Bridge");
+#elif defined(TARGET_LINUX)
+		return ofIsStringInString(device.getDeviceName(), "ttyUSB0") || ofIsStringInString(device.getDeviceName(), "ttyUSB1");
 #else
 		return ofIsStringInString(device.getDeviceName(), "tty.SLAB_USBtoUART");
 	#endif

@@ -22,4 +22,10 @@ vs:
 linux:
 	ADDON_SOURCES_EXCLUDE = libs/rplidar/src/arch/win32%
 	ADDON_SOURCES_EXCLUDE += libs/rplidar/src/arch/macOS%
+	ADDON_DEFINES = __GNUC__
+
+linux64:
+	ADDON_SOURCES_EXCLUDE = libs/rplidar/src/arch/win32%
+	ADDON_SOURCES_EXCLUDE += libs/rplidar/src/arch/macOS%
+	ADDON_DEFINES = __GNUC__
 
