@@ -120,8 +120,16 @@ bool device::A2::connect(const string &serial_path, int baud_rate)
 		// drv->reset();
 		return false;
 	}
-	
+
+	// Get device scan modes
+	driver_->getAllSupportedScanModes(scanModes);
+	scanMode = 0;
+
 	return true;
+}
+
+void device::A2::setScanMode(int scanMode_) {
+	scanMode = scanMode_;
 }
 
 bool device::A2::reconnect(int baud_rate)
@@ -148,7 +156,7 @@ bool device::A2::start(bool threaded)
 {
 	if(isConnected()
 	   && !IS_FAIL(driver_->startMotor())
-	   && !IS_FAIL(driver_->startScan(true, true))) {
+     && !IS_FAIL(driver_->startScan(false, scanModes[scanMode].id))) {
 		if(threaded) {
 			startThread();
 		}

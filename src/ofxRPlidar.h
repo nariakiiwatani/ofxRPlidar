@@ -48,9 +48,11 @@ public:
 	bool start(bool threaded=true);
 	bool stop();
 	void update();
+	void setScanMode(int scanMode_=0);
 	bool isFrameNew() const { return is_frame_new_; }
 	std::vector<ScannedData> scan(bool ascend=true);
 	std::vector<ScannedData> getResult();
+  std::vector<rp::standalone::rplidar::RplidarScanMode> scanModes;
 	std::string getSerialPath() const { serial_path_; }
 	std::string getSerialNumber() const;
 protected:
@@ -58,6 +60,7 @@ protected:
 	bool has_new_frame_=false;
 	bool is_frame_new_=false;
 	void threadedFunction();
+	int scanMode;
 	DoubleBuffer<std::vector<ScannedData>> result_;
 	rp::standalone::rplidar::RPlidarDriver *driver_;
 	rplidar_response_device_info_t device_info_;
