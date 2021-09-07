@@ -156,7 +156,7 @@ bool device::A2::start(bool threaded)
 {
 	if(isConnected()
 	   && !IS_FAIL(driver_->startMotor())
-     && !IS_FAIL(driver_->startScan(false, scanModes[scanMode].id))) {
+     && !IS_FAIL(driver_->startScan(false, true, 0, &scanModes[scanMode]))) {
 		if(threaded) {
 			startThread();
 		}
